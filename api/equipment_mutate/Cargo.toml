@@ -1,0 +1,11 @@
+[package]
+name = "equipment_mutate"
+version = "0.1.0"
+authors = ["Pocket Of Weird <hartzlernathan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+http = "0.1"
+now_lambda = "*"
+serde_json = "*"
+types = { path = "../../types" }

@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "name": "avgearclub",
+  "builds": [
+    {
+      "src": "functions/**/index.rs",
+      "use": "@now/rust@canary"
+    },
+    {
+      "src": "ui/package.json",
+      "use": "@now/static-build",
+      "config": { "distDir": "public" }
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "functions/$1/index.rs" },
+    {
+      "src": "/static/(.*)",
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "dest": "ui/static/$1"
+    },
+    { "src": "/favicon.ico", "dest": "ui/favicon.ico" },
+    { "src": "/img/(.*)", "dest": "ui/img/$1"},
+    { "src": "/asset-manifest.json", "dest": "ui/asset-manifest.json" },
+    { "src": "/manifest.json", "dest": "ui/manifest.json" },
+    { "src": "/precache-manifest.(.*)", "dest": "ui/precache-manifest.$1" },
+    {
+      "src": "/service-worker.js",
+      "headers": { "cache-control": "s-maxage=0" },
+      "dest": "ui/service-worker.js"
+    },
+    {
+      "src": "^(.*)$",
+      "headers": { "cache-control": "s-maxage=0" },
+      "dest": "/ui/index.html"
+    }
+  ]
+}

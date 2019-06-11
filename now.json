@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "name": "avgearclub",
+  "builds": [
+    {
+      "src": "api/equipment_mutate/Cargo.toml",
+      "use": "@now/rust@canary"
+    },
+    {
+      "src": "api/equipment_query/Cargo.toml",
+      "use": "@now/rust@canary"
+    },
+    {
+      "src": "index.html",
+      "use": "@now/static"
+    }
+  ],
+  "routes": [
+    { "methods": ["POST"], "src": "/api/equipment(.*)", "dest": "/api/equipment_mutate/equipment_mutate" },
+    { "methods": ["GET"], "src": "/api/equipment(.*)", "dest": "/api/equipment_query/equipment_query" }
+  ]
+}

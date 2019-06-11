@@ -1,0 +1,12 @@
+[package]
+name = "types"
+version = "0.1.0"
+authors = ["Pocket Of Weird <hartzlernathan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+serde = { version = "*", features = ["derive"] }
+serde_json = "*"
+now_lambda = "*"
+uuid = { version = "0.7", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
