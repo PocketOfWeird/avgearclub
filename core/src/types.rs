@@ -67,7 +67,7 @@ impl Piece {
     pub fn update_list(equipment_id: Uuid, input_list: &Vec<PieceInput>) -> Vec<Piece> {
         let mut pieces: Vec<Piece> = Vec::new();
         for input in input_list {
-            match input.id.is_none() {
+            match input.id.is_none() && input.equipment_id.is_none() {
                 true => pieces.push(Piece::new(equipment_id, input)),
                 false => pieces.push(Piece::update(input)),
             }
