@@ -1,8 +1,8 @@
+//use crate::request::from_body;
 use chrono::{DateTime, Utc};
-use now_lambda::Body;
+//use now_lambda::Body;
 use serde::{Deserialize, Serialize};
-use serde_json;
-use std::convert::From;
+//use std::convert::From;
 use uuid::Uuid;
 
 /// A barcoded piece of equipment
@@ -15,12 +15,67 @@ pub struct Piece {
     /// The name of the piece
     pub name: String,
     /// The serial number of the piece
-    pub serial: String,
+    pub serial: Option<String>,
     /// The status of the piece
     pub status: String,
     /// The id of the equipment the piece belongs to
     pub equipment_id: Uuid,
 }
+#[derive(Deserialize, Serialize)]
+pub struct PieceInput {
+    /// The unique id of the piece if created
+    pub id: Option<Uuid>,
+    /// The barcode of the piece
+    pub barcode: String,
+    /// The name of the piece
+    pub name: String,
+    /// The serial number of the piece
+    pub serial: Option<String>,
+    /// The status of the piece
+    pub status: String,
+    /// The id of the equipment the piece belongs to if created
+    pub equipment_id: Option<Uuid>,
+}
+impl Piece {
+    pub fn new(equipment_id: Uuid, input: &PieceInput) -> Piece {
+        Piece {
+            id: Uuid::new_v4(),
+            barcode: input.barcode.to_owned(),
+            name: input.name.to_owned(),
+            serial: Some(input.serial.to_owned().unwrap_or_default()),
+            status: input.status.to_owned(),
+            equipment_id: equipment_id,
+        }
+    }
+    pub fn update(input: &PieceInput) -> Piece {
+        Piece {
+            id: input.id.unwrap(),
+            barcode: input.barcode.to_owned(),
+            name: input.name.to_owned(),
+            serial: Some(input.serial.to_owned().unwrap_or_default()),
+            status: input.status.to_owned(),
+            equipment_id: input.equipment_id.unwrap(),
+        }
+    }
+    pub fn new_list(equipment_id: Uuid, input_list: &Vec<PieceInput>) -> Vec<Piece> {
+        let mut pieces: Vec<Piece> = Vec::new();
+        for input in input_list {
+            pieces.push(Piece::new(equipment_id, input));
+        }
+        return pieces;
+    }
+    pub fn update_list(equipment_id: Uuid, input_list: &Vec<PieceInput>) -> Vec<Piece> {
+        let mut pieces: Vec<Piece> = Vec::new();
+        for input in input_list {
+            match input.id.is_none() {
+                true => pieces.push(Piece::new(equipment_id, input)),
+                false => pieces.push(Piece::update(input)),
+            }
+        }
+        return pieces;
+    }
+}
+
 
 /// A specific type of equipment
 #[derive(Deserialize, Serialize)]
@@ -34,16 +89,48 @@ pub struct Equipment {
     /// The barcoded pieces of the equipment
     pub pieces: Vec<Piece>,
     /// The id of the kit the equipment may belong to
-    pub kit_id: Uuid,
+    pub kit_id: Option<Uuid>,
     /// The id of the category the equipment may belong to
-    pub category_id: Uuid,
+    pub category_id: Option<Uuid>,
 }
-
-impl From<Body> for Equipment {
-    fn from(body: Body) -> Equipment {
-        let data = String::from(body);
-        let equipment: Equipment = serde_json::from_str(&data).unwrap();
-        return equipment;
+#[derive(Deserialize, Serialize)]
+pub struct EquipmentInput {
+    /// The unique id of the equipment if created
+    pub id: Option<Uuid>,
+    /// The manufacturer of the equipment
+    pub manufacturer: String,
+    /// The model of the equipment
+    pub model: String,
+    /// At least one barcoded piece of the equipment
+    pub pieces: Vec<PieceInput>,
+    /// The id of the kit the equipment may belong to
+    pub kit_id: Option<Uuid>,
+    /// The id of the category the equipment may belong to
+    pub category_id: Option<Uuid>,
+}
+impl Equipment {
+    pub fn new(input: &EquipmentInput) -> Equipment {
+        let equipment_id = Uuid::new_v4();
+        let pieces = Piece::new_list(equipment_id, &input.pieces);
+        Equipment {
+            id: equipment_id,
+            manufacturer: input.manufacturer.to_owned(),
+            model: input.model.to_owned(),
+            pieces: pieces,
+            kit_id: Some(input.kit_id.to_owned().unwrap_or_default()),
+            category_id: Some(input.category_id.to_owned().unwrap_or_default()),
+        }
+    }
+    pub fn update(input: &EquipmentInput) -> Equipment {
+        let pieces = Piece::update_list(input.id.unwrap(), &input.pieces);
+        Equipment {
+            id: input.id.unwrap(),
+            manufacturer: input.manufacturer.to_owned(),
+            model: input.model.to_owned(),
+            pieces: pieces,
+            kit_id: Some(input.kit_id.to_owned().unwrap_or_default()),
+            category_id: Some(input.category_id.to_owned().unwrap_or_default()),
+        }
     }
 }
 
@@ -163,3 +250,26 @@ pub struct Reservation {
     /// The end date and time of the reservation
     pub end: DateTime<Utc>,
 }
+
+#[derive(Serialize, Deserialize)]
+/// An event that tracks the changes made to an object
+pub struct ChangeEvent {
+    /// The unique id of the event
+    pub id: Uuid,
+    /// The action, or type of event
+    pub action: String,
+    /// The previous event in the chain
+    pub previous_event: Option<Uuid>,
+    /// The next event in the chain
+    pub next_event: Option<Uuid>,
+}
+// impl ChangeEvent {
+//     fn new(action: String, previous_event: Option<Uuid>, next_event: Option<Uuid>) -> ChangeEvent {
+//         ChangeEvent {
+//             id: Uuid::new_v4(),
+//             action: action,
+//             previous_event: previous_event,
+//             next_event: next_event,
+//         }
+//     }
+// }

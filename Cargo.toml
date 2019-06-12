@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "types",
+    "core",
     "api/equipment_mutate",
     "api/equipment_query",
 ]

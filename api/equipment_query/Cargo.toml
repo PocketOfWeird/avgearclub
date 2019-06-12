@@ -1,11 +1,11 @@
 [package]
 name = "equipment_query"
 version = "0.1.0"
-author = "Pocket Of Weird <hartzlernathan@gmail.com>"
+authors = ["Pocket Of Weird <hartzlernathan@gmail.com>"]
 edition = "2018"
 
 [dependencies]
 http = "0.1"
 now_lambda = "*"
 #serde_json = "*"
-#types = { path = "../../types" }
+#core = { path = "../../core" }

@@ -3,3 +3,4 @@
 Cargo.lock
 ui/node_modules
 /Cargo.toml
+sample.now.json

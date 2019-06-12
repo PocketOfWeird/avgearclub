@@ -1,20 +1,21 @@
-use http::{header, StatusCode};
-use now_lambda::{error::NowError, lambda, IntoResponse, Request, Response};
-use serde_json;
+use core::request::from_body;
+use core::response::{json_error, json_ok};
+use core::types::{Equipment, EquipmentInput};
+use now_lambda::{error::NowError, lambda, IntoResponse, Request};
 use std::error::Error;
-use types::Equipment;
+
 
 fn handler(request: Request) -> Result<impl IntoResponse, NowError> {
-    // let (parts, body) = request.into_parts();
-    // let body = serde_json::to_vec(&body).expect("Failed to serialize to JSON");
-    let equipment: Equipment = Equipment::from(request.into_body());
-    let response = Response::builder()
-        .status(StatusCode::OK)
-        .header(header::CONTENT_TYPE, "text/json")
-        .body(serde_json::to_string(&equipment).expect("Failed to serialize to JSON"))
-        .expect("failed to render response");
+    let input: EquipmentInput = match from_body(request.into_body()) {
+        Ok(input) => input,
+        Err(e) => return json_error(e),
+    };
+    let equipment: Equipment = match input.id.is_none() {
+        true => Equipment::new(&input),
+        false => Equipment::update(&input)
+    };
 
-    return Ok(response);
+    return json_ok(&equipment);
 }
 
 fn main() -> Result<(), Box<dyn Error>> {

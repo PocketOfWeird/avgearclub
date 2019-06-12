@@ -8,4 +8,4 @@ edition = "2018"
 http = "0.1"
 now_lambda = "*"
 serde_json = "*"
-types = { path = "../../types" }
+core = { path = "../../core" }

@@ -2,7 +2,7 @@ use http::{header, StatusCode};
 use now_lambda::{error::NowError, lambda, IntoResponse, Request, Response};
 use std::error::Error;
 //use serde_json;
-//use types::Equipment;
+//use core::types::Equipment;
 
 fn handler(request: Request) -> Result<impl IntoResponse, NowError> {
     // let (parts, body) = request.into_parts();

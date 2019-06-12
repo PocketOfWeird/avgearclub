@@ -1,12 +1,13 @@
 [package]
-name = "types"
+name = "core"
 version = "0.1.0"
 authors = ["Pocket Of Weird <hartzlernathan@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+http = "0.1"
+now_lambda = "*"
 serde = { version = "*", features = ["derive"] }
 serde_json = "*"
-now_lambda = "*"
 uuid = { version = "0.7", features = ["v4", "serde"] }
-chrono = { version = "0.4", features = ["serde"] }
